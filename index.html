@@ -9,13 +9,13 @@
     <body>
         
         <script type="text/x-handlebars" data-template-name="application">
-            <h2 id="status">{{App.mainController.status}}</h2>
+            <h2 id="status">{{status}}</h2>
             <div>
-                <button {{action "listRooms" target="App.mainController"}}>List Rooms!</button>
-                <button {{action "listDevices" target="App.mainController"}}>List Devices!</button>
+                <button {{action "listRooms" }}>List Rooms!</button>
+                <button {{action "listDevices" }}>List Devices!</button>
             </div>
             
-            <div id="content"></div>
+            <div id="content">{{outlet}}</div>
             
         </script>
         

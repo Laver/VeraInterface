@@ -4,24 +4,35 @@
 var App = Ember.Application.create({
     
     Router : Ember.Router.extend({
-      root: Ember.Route.extend({
-        index: Ember.Route.extend({
-          route: '/'
-        }),
-        rooms:  Ember.Route.extend({
-            route: '/rooms',
-            connectOutlets:  function(router, context){
-              router.get('roomListController').connectOutlet('roomList');
-            },
+        root: Ember.Route.extend({
             index: Ember.Route.extend({
               route: '/'
             }),
-            enter: function ( router ){
-              console.log("The rooms sub-state was entered.");
-              
-            }
-          })
-      })
+            rooms:  Ember.Route.extend({
+                route: '/rooms',
+                connectOutlets:  function(router, context){
+                  router.get('applicationController').connectOutlet('roomList');
+                },
+                index: Ember.Route.extend({
+                  route: '/'
+                }),
+                enter: function ( router ){
+                  //
+                }
+            }),
+            devices:  Ember.Route.extend({
+                route: '/devices',
+                connectOutlets:  function(router, context){
+                  router.get('applicationController').connectOutlet('deviceList');
+                },
+                index: Ember.Route.extend({
+                  route: '/'
+                }),
+                enter: function ( router ){
+                  //
+                }
+            })
+        })
     }),
     
     /**************************
@@ -42,7 +53,7 @@ var App = Ember.Application.create({
       templateName: 'device-list'
     }),
     
-    mainController : Em.ObjectController.create({
+    ApplicationController : Em.ObjectController.extend({
         
         statusUrl:"data/lu_status2.json",
         dataUrl:"data/user_data2.json",
@@ -73,21 +84,20 @@ var App = Ember.Application.create({
             });
         },
         listRooms : function(){
-            //debugger;
+            App.get("router").transitionTo("rooms");
         },
         listDevices : function(){
-            //App.DeviceListView.appendTo("#content");
+            App.get("router").transitionTo("devices");
         }
         
     }),
     
-    ApplicationController : this.mainController,
+    //ApplicationController : this.mainController,
     
     
     ready : function(){
-        //debugger;
         //App.mainController = App.MainController.create();
-        App.mainController.loadData();
+        App.get('router.applicationController').loadData();
     }
     
 });
@@ -277,3 +287,5 @@ App.deviceController = Em.ArrayController.create({
 
 
 App.initialize();
+
+
