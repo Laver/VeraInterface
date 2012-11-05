@@ -1,0 +1,23 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Vera UI Data Test</title>
+        <link rel="stylesheet" href="css/main.css" type="text/css"/>
+        
+    </head>
+    
+    <body>
+        
+        <script type="text/x-handlebars" data-template-name="application">
+            <h2 id="status">{{App.mainController.status}}</h2>
+            
+            <button {{action "loadData" target="App.mainController"}}>Load Data!</button>
+        </script>
+        
+        <!-- load scripts at the bottom of your page -->
+        <script src="scripts/lib/jquery.min.js"></script>
+        <script src="scripts/lib/handlebars.js"></script>
+        <script src="scripts/lib/ember.min.js"></script>
+        <script src="scripts/app.js"></script>
+    </body>
+</html>
