@@ -10,8 +10,33 @@
         
         <script type="text/x-handlebars" data-template-name="application">
             <h2 id="status">{{App.mainController.status}}</h2>
-            
-            <button {{action "loadData" target="App.mainController"}}>Load Data!</button>
+            <div>
+                <button {{action "loadData" target="App.mainController"}}>Load Data!</button>
+                <button {{action "loadStatus" target="App.mainController"}}>Load Status!</button>
+            </div>
+            Rooms:
+            <ul>
+                {{#each App.roomController}}
+                    <li>
+                        Name: {{name}}
+                        ID: {{id}}
+                    </li>
+                {{/each}}
+            </ul>
+            Devices:
+            <ul>
+                {{#each App.deviceController}}
+                    <li>
+                        Name: {{name}}
+                        ID: {{id}}
+                        Status: {{status}}
+                        {{#if targetLevel}}
+                            Current Level: {{currentLevel}}
+                            Target Level: {{targetLevel}}
+                        {{/if}}
+                    </li>
+                {{/each}}
+            </ul>
         </script>
         
         <!-- load scripts at the bottom of your page -->
