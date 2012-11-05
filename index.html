@@ -11,28 +11,39 @@
         <script type="text/x-handlebars" data-template-name="application">
             <h2 id="status">{{App.mainController.status}}</h2>
             <div>
-                <button {{action "loadData" target="App.mainController"}}>Load Data!</button>
-                <button {{action "loadStatus" target="App.mainController"}}>Load Status!</button>
+                <button {{action "listRooms" target="App.mainController"}}>List Rooms!</button>
+                <button {{action "listDevices" target="App.mainController"}}>List Devices!</button>
             </div>
-            Rooms:
+            
+            <div id="content"></div>
+            
+        </script>
+        
+        
+        <script type="text/x-handlebars" data-template-name="room-list">
+        Rooms:
             <ul>
                 {{#each App.roomController}}
                     <li>
-                        Name: {{name}}
+                        Name: <strong>{{name}}</strong>
                         ID: {{id}}
                     </li>
                 {{/each}}
             </ul>
-            Devices:
+        </script>
+        <script type="text/x-handlebars" data-template-name="device-list">
+        Devices:
             <ul>
                 {{#each App.deviceController}}
                     <li>
-                        Name: {{name}}
-                        ID: {{id}}
-                        Status: {{status}}
-                        {{#if targetLevel}}
-                            Current Level: {{currentLevel}}
-                            Target Level: {{targetLevel}}
+                        Name: <strong>{{name}}</strong>
+                        ID: {{id}}</br>
+                        Status: {{status}}</br>
+                        {{#if currentLevel}}
+                            Current Level: {{currentLevel}}</br>
+                            {{#unless isAtTarget}}
+                                Target Level: {{targetLevel}}</br>
+                            {{/unless}}
                         {{/if}}
                     </li>
                 {{/each}}
