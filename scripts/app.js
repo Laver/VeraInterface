@@ -11,7 +11,7 @@ var App = Ember.Application.create({
             rooms:  Ember.Route.extend({
                 route: '/rooms',
                 connectOutlets:  function(router, context){
-                  router.get('applicationController').connectOutlet('roomList');
+                  router.get('applicationController').connectOutlet('roomList', App.roomController);
                 },
                 index: Ember.Route.extend({
                   route: '/'
@@ -23,7 +23,7 @@ var App = Ember.Application.create({
             devices:  Ember.Route.extend({
                 route: '/devices',
                 connectOutlets:  function(router, context){
-                  router.get('applicationController').connectOutlet('deviceList');
+                  router.get('applicationController').connectOutlet('deviceList', App.deviceController);
                 },
                 index: Ember.Route.extend({
                   route: '/'
@@ -46,12 +46,12 @@ var App = Ember.Application.create({
     RoomListView : Em.View.extend({
       templateName: 'room-list'
     }),
-
-    RoomListController: Em.Controller.extend(),
+    RoomListController: Em.ArrayController.extend(),
     
     DeviceListView : Em.View.extend({
       templateName: 'device-list'
     }),
+    DeviceListController: Em.ArrayController.extend(),
     
     ApplicationController : Em.ObjectController.extend({
         
@@ -79,6 +79,7 @@ var App = Ember.Application.create({
             
             $.getJSON(url, function(data){
                 App.roomController.initRooms(data.rooms);
+                //App.Rooms.initRooms(data.rooms);
                 App.deviceController.initDevices(data.devices);
                 me.set("status", "Complete. Rooms:"+ App.roomController.get("length") +" Devices:" + App.deviceController.get("length") );
             });
@@ -92,11 +93,7 @@ var App = Ember.Application.create({
         
     }),
     
-    //ApplicationController : this.mainController,
-    
-    
     ready : function(){
-        //App.mainController = App.MainController.create();
         App.get('router.applicationController').loadData();
     }
     
@@ -187,47 +184,7 @@ App.DeviceTypeEnum = {
 /**************************
 * Controllers
 **************************/
-/*
-App.mainController = Em.ObjectController.create({
-    
-    statusUrl:"data/lu_status2.json",
-    dataUrl:"data/user_data2.json",
-    status : "Ready",
-    
-    loadStatus : function () {
-     
-        var me = this;
-        var url = me.get("statusUrl");
-        me.set("status", "Loading..." + url);
-        
-        $.getJSON(url, function(data){
-            $(data).each(function(index,value){
-                console.log(index, value);
-                //me.pushObject(t);
-            })
-        })
-    },
-    loadData : function () {
-     
-        var me = this;
-        var url = me.get("dataUrl");
-        me.set("status", "Loading..." + url);
-        
-        $.getJSON(url, function(data){
-            App.roomController.initRooms(data.rooms);
-            App.deviceController.initDevices(data.devices);
-            me.set("status", "Complete. Rooms:"+ App.roomController.get("length") +" Devices:" + App.deviceController.get("length") );
-        });
-    },
-    listRooms : function(){
-        App.RoomListView.appendTo("#content");
-    },
-    listDevices : function(){
-        //App.DeviceListView.appendTo("#content");
-    }
-    
-});
-*/
+
 App.roomController = Em.ArrayController.create({
     
     content : [],
@@ -243,9 +200,25 @@ App.roomController = Em.ArrayController.create({
     },
     findById : function ( id ) {
         return this.findProperty("id", id);
-    },
-    all: [1,2,3]
+    }
     
+});
+
+App.Rooms = Em.Object.extend({
+    allRooms : [],
+    initRooms : function ( roomArray ) {
+        var me = this;
+        // clear the rooms list
+        me.set("content",[]);
+        // loop through the passed array and create new room items
+        roomArray.forEach(function (item){
+            var newRoom = App.Room.create( { name : item.name , id : item.id } );
+            me.pushObject(newRoom);
+        });
+    },
+    findById : function ( id ) {
+        return this.findProperty("id", id);
+    }
 });
 
 

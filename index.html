@@ -23,10 +23,10 @@
         <script type="text/x-handlebars" data-template-name="room-list">
         Rooms:
             <ul>
-                {{#each App.roomController}}
+                {{#each room in controller}}
                     <li>
-                        Name: <strong>{{name}}</strong>
-                        ID: {{id}}
+                        Name: <strong>{{room.name}}</strong>
+                        ID: {{room.id}}
                     </li>
                 {{/each}}
             </ul>
@@ -34,15 +34,15 @@
         <script type="text/x-handlebars" data-template-name="device-list">
         Devices:
             <ul>
-                {{#each App.deviceController}}
+                {{#each device in controller}}
                     <li>
-                        Name: <strong>{{name}}</strong>
-                        ID: {{id}}</br>
-                        Status: {{status}}</br>
-                        {{#if currentLevel}}
-                            Current Level: {{currentLevel}}</br>
-                            {{#unless isAtTarget}}
-                                Target Level: {{targetLevel}}</br>
+                        Name: <strong>{{device.name}}</strong>
+                        ID: {{device.id}}</br>
+                        Status: {{device.status}}</br>
+                        {{#if device.currentLevel}}
+                            Current Level: {{device.currentLevel}}</br>
+                            {{#unless device.isAtTarget}}
+                                Target Level: {{device.targetLevel}}</br>
                             {{/unless}}
                         {{/if}}
                     </li>
