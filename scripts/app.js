@@ -75,15 +75,72 @@ var App = Ember.Application.create({
     RoomListController: Em.ArrayController.extend(),
     
     DeviceListView : Em.View.extend({
-      templateName: 'device-list'
+        templateName : 'device-list'
     }),
+    DeviceListView2 : Em.CollectionView.extend({
+  
+        itemViewClass: this.DefaultView,
+        
+        createChildView: function(view, attrs) {
+            console.log("createChildView",view, attrs);
+            switch (attrs.content.device_view) {
+                case "DeviceSwitchView":
+                   view = App.DeviceSwitchView;
+                   break;
+                case "DeviceDimmableLightView": 
+                   view = App.DeviceDimmableLightView;
+                   break;              
+            }
+            
+            return this._super(view, attrs);
+        },
+        content:['b']
+    }),
+    
+    
     DeviceListController: Em.ArrayController.extend({
+        
+        setDeviceTarget : function ( device, newTarget ){
+            console.log("setDeviceTarget", device, newTarget);
+        },
+        getDeviceView : function ( device ) {
+            console.log(device);
+            return DeviceSwitchView;
+        }
+        
+    }),
+    
+    DefaultView : Ember.View.extend({
+        template: function (context) {
+            debugger;
+            switch (context.content.device_view) {
+                case "DeviceSwitchView":
+                   return App.DeviceSwitchView;
+                   break;
+                case "DeviceDimmableLightView": 
+                   return App.DeviceDimmableLightView;
+                   break;              
+            }
+        }
+    }),
+    
+    DeviceSwitchView : Em.View.extend({
+        templateName: "device-switch"
+    }),
+    
+    DeviceDimmableLightView : Em.View.extend({
+        templateName: "device-dimmablelight"
+    }),
+    
+    DeviceController: Em.ArrayController.extend({
         
         setDeviceTarget : function ( device, newTarget ){
             console.log("setDeviceTarget", device, newTarget);
         }
         
     }),
+    
+    
     
     ApplicationController : Em.ObjectController.extend({
         
@@ -153,6 +210,8 @@ App.Device = Em.Object.extend ({
     device_type: null,
     room_id: null,
     room: null,
+    service_id: null,
+    device_view: null,
     /*room: function(key, value) {
         // getter
         if (arguments.length === 1) {
@@ -172,10 +231,16 @@ App.Device = Em.Object.extend ({
     states: [],
     isOn: function () { return (this.status == "1"); }.property("status"),
     
+    SetTarget : function ( newVal ) {
+        var request = "/data_request?id=action&DeviceNum=" + this.id;
+        request += "&serviceId=" + this.service_id;
+        request += "&action=SetTarget&newTargetValue=" + newVal;
+    }
 });
 
 App.Switch = App.Device.extend ({
     
+    device_view : "DeviceSwitchView",
     setStates: function ( statesArray ) {
         this.states = statesArray;
         this.status = statesArray.findProperty("variable", "Status").value;
@@ -184,6 +249,7 @@ App.Switch = App.Device.extend ({
 });
 App.DimmableLight = App.Device.extend ({
 
+    device_view : "DeviceDimmableLightView",
     currentLevel: null,
     targetLevel: null,
     isAtTarget: function () { return (this.currentLevel == this.targetLevel); },
@@ -238,6 +304,7 @@ App.Scenes.reopenClass({
             return a.get('room') - b.get('room');
         });
         var sc = this._sortedScenes;
+        sc.clear();
         sorted.forEach (function (item) {
             sc.pushObject(item);
         });
@@ -306,6 +373,7 @@ App.Devices.reopenClass({
                         name : item.name , 
                         id : item.id, 
                         room_id : item.room,
+                        service_id : item.serviceId,
                         device_type : item.device_type
                     });
                 device.setStates(item.states);
@@ -315,6 +383,22 @@ App.Devices.reopenClass({
     }
 });
 
+Ember.Handlebars.registerHelper('deviceView', function() {
+    //debugger;
+    /*
+    var viewname = App.DeviceDimmableLightView.get('className');
+    console.log(this.device_view, App.DeviceDimmableLightView.get('className'));
+    switch (this.device_view)
+    {
+        case App.DeviceSwitchView.get('className'):
+            return new Handlebars.SafeString("TEST" + App.DeviceSwitchView.get('className'));
+        case App.DeviceDimmableLightView.get('className'):
+            return new Handlebars.SafeString("TEST" + App.DeviceDimmableLightView.get('className'));
+    }
+    */
+    
+    //return new Handlebars.SafeString("TEST" + this.device_view);
+});
 
 
 App.initialize();

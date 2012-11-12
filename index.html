@@ -50,9 +50,19 @@
                 {{/each}}
             </ul>
         </script>
+
+
+        <script type="text/x-handlebars" data-template-name="device-list2">
+        Devices:
+            <ul>
+            
+                
+            </ul>
+        </script>
         <script type="text/x-handlebars" data-template-name="device-list">
         Devices:
             <ul>
+            
                 {{#each device in controller}}
                     {{#with device}}
                         <li>
@@ -68,7 +78,28 @@
                         </li>
                     {{/with}}
                 {{/each}}
+                
             </ul>
+        </script>
+        
+        <script type="text/x-handlebars" data-template-name="device-default">
+            DEFAULT
+        </script>
+        <script type="text/x-handlebars" data-template-name="device-switch">
+                Name: <strong>{{content.name}}</strong>
+                ID: {{id}}</br>
+                Status: {{status}}</br>
+                {{#if currentLevel}}
+                    Current Level: {{currentLevel}}</br>
+                    {{#unless isAtTarget}}
+                        Target Level: {{targetLevel}}</br>
+                    {{/unless}}
+                {{/if}}
+            <button>On</button>
+            <button>Off</button>
+        </script>
+        <script type="text/x-handlebars" data-template-name="device-dimmablelight">
+            <input type="text"></input><button>Set</button>
         </script>
         
         <!-- load scripts at the bottom of your page -->
