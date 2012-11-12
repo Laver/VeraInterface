@@ -206,7 +206,6 @@ App.Scenes.reopenClass({
   initScenes : function ( sceneArray ) {
         console.log("initScenes");
         var ds = this._listOfScenes;
-        ds.sortProperties = ['room'];
         // clear the scene list
         ds.clear();
         // loop through the passed array and create new room items
