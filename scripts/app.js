@@ -15,6 +15,10 @@ var App = Ember.Application.create({
                 },
                 enter: function ( router ){
                   //
+                },
+                runScene : function( router, event ){
+                    var scene = event.context;
+                    router.get('sceneListController').runScene(scene);
                 }
             }),
             rooms:  Ember.Route.extend({
@@ -56,7 +60,14 @@ var App = Ember.Application.create({
     SceneListView : Em.View.extend({
       templateName: 'scene-list'
     }),
-    SceneListController: Em.ArrayController.extend(),
+    SceneListController: Em.ArrayController.extend({
+        
+        // Method to execute a specific scene
+        runScene : function ( scene ) {
+            console.log("RunScene", scene.id, scene.name);
+        }
+        
+    }),
     
     RoomListView : Em.View.extend({
       templateName: 'room-list'
@@ -66,7 +77,13 @@ var App = Ember.Application.create({
     DeviceListView : Em.View.extend({
       templateName: 'device-list'
     }),
-    DeviceListController: Em.ArrayController.extend(),
+    DeviceListController: Em.ArrayController.extend({
+        
+        setDeviceTarget : function ( device, newTarget ){
+            console.log("setDeviceTarget", device, newTarget);
+        }
+        
+    }),
     
     ApplicationController : Em.ObjectController.extend({
         
