@@ -11,6 +11,7 @@
         <script type="text/x-handlebars" data-template-name="application">
             <h2 id="status">{{status}}</h2>
             <div>
+                <button {{action "reloadData" }}>Reload</button>
                 <button {{action "listRooms" }}>List Rooms!</button>
                 <button {{action "listDevices" }}>List Devices!</button>
             </div>
@@ -24,10 +25,12 @@
         Rooms:
             <ul>
                 {{#each room in controller}}
-                    <li>
-                        Name: <strong>{{room.name}}</strong>
-                        ID: {{room.id}}
-                    </li>
+                    {{#with room}}
+                        <li>
+                            Name: <strong>{{name}}</strong>
+                            ID: {{id}}
+                        </li>
+                    {{/with}}
                 {{/each}}
             </ul>
         </script>

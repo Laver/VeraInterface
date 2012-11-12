@@ -6,16 +6,13 @@ var App = Ember.Application.create({
     Router : Ember.Router.extend({
         root: Ember.Route.extend({
             index: Ember.Route.extend({
-              route: '/'
+                route: '/'
             }),
             rooms:  Ember.Route.extend({
                 route: '/rooms',
                 connectOutlets:  function(router, context){
-                  router.get('applicationController').connectOutlet('roomList', App.roomController);
+                  router.get('applicationController').connectOutlet('roomList', App.Rooms.all());
                 },
-                index: Ember.Route.extend({
-                  route: '/'
-                }),
                 enter: function ( router ){
                   //
                 }
@@ -23,15 +20,18 @@ var App = Ember.Application.create({
             devices:  Ember.Route.extend({
                 route: '/devices',
                 connectOutlets:  function(router, context){
-                  router.get('applicationController').connectOutlet('deviceList', App.deviceController);
+                  router.get('applicationController').connectOutlet('deviceList', App.Devices.all());
                 },
-                index: Ember.Route.extend({
-                  route: '/'
-                }),
                 enter: function ( router ){
                   //
                 }
-            })
+            }),
+            
+            listRooms : Ember.Route.transitionTo("rooms"),
+            listDevices : Ember.Route.transitionTo("devices"),
+            reloadData : function (router) {
+                router.get('applicationController').reloadData();
+            }
         })
     }),
     
@@ -69,8 +69,8 @@ var App = Ember.Application.create({
                 $(data).each(function(index,value){
                     console.log(index, value);
                     //me.pushObject(t);
-                })
-            })
+                });
+            });
         },
         loadData : function () {
             var me = this;
@@ -78,17 +78,14 @@ var App = Ember.Application.create({
             me.set("status", "Loading..." + url);
             
             $.getJSON(url, function(data){
-                App.roomController.initRooms(data.rooms);
-                //App.Rooms.initRooms(data.rooms);
-                App.deviceController.initDevices(data.devices);
-                me.set("status", "Complete. Rooms:"+ App.roomController.get("length") +" Devices:" + App.deviceController.get("length") );
+                App.Rooms.initRooms(data.rooms);
+                App.Devices.initDevices(data.devices);
+                me.set("status", "Complete. Rooms:"+ App.Rooms.all().get("length") +" Devices:" + App.Devices.all().get("length") );
             });
         },
-        listRooms : function(){
-            App.get("router").transitionTo("rooms");
-        },
-        listDevices : function(){
-            App.get("router").transitionTo("devices");
+        reloadData : function () {
+            console.log("ReloadData!");
+            this.loadData();
         }
         
     }),
@@ -118,7 +115,6 @@ App.Room = Em.Object.extend ({
     name: null,
     devices: []
 });
- 
  
 App.Device = Em.Object.extend ({
     
@@ -176,60 +172,54 @@ App.DeviceTypeEnum = {
     
     "urn:schemas-upnp-org:device:DimmableLight:1" : App.DimmableLight,
     "urn:schemas-upnp-org:device:BinaryLight:1" : App.Switch
-    
-    
+
 };
 
-
-/**************************
-* Controllers
-**************************/
-
-App.roomController = Em.ArrayController.create({
+App.Rooms = Ember.Object.extend();
+App.Rooms.reopenClass({
+  _listOfRooms:  Em.A(),
+  all:  function(){
+    var allRooms = this._listOfRooms;
     
-    content : [],
-    initRooms : function ( roomArray ) {
-        var me = this;
+    // AJAX call would go here to populate as required
+    
+    return this._listOfRooms;
+  },
+  find:  function(id){
+    return this._listOfRooms.findProperty('id', id);
+  },
+  initRooms : function ( roomArray ) {
+        console.log("initRooms");
+        var ds = this._listOfRooms;
         // clear the rooms list
-        me.set("content",[]);
+        ds.clear();
         // loop through the passed array and create new room items
         roomArray.forEach(function (item){
             var newRoom = App.Room.create( { name : item.name , id : item.id } );
-            me.pushObject(newRoom);
+            ds.pushObject(newRoom);
         });
-    },
-    findById : function ( id ) {
-        return this.findProperty("id", id);
     }
+});
+App.Devices = Ember.Object.extend();
+App.Devices.reopenClass({
+  _listOfDevices:  Em.A(),
+  all:  function(){
+    var allDevices = this._listOfDevices;
     
-});
-
-App.Rooms = Em.Object.extend({
-    allRooms : [],
-    initRooms : function ( roomArray ) {
-        var me = this;
+    // AJAX call would go here to populate as required
+    
+    return this._listOfDevices;
+  },
+  find:  function(id){
+    return this._listOfDevices.findProperty('id', id);
+  },
+  initDevices : function ( data ) {
+        console.log("initDevices");
+        var ds = this._listOfDevices;
         // clear the rooms list
-        me.set("content",[]);
-        // loop through the passed array and create new room items
-        roomArray.forEach(function (item){
-            var newRoom = App.Room.create( { name : item.name , id : item.id } );
-            me.pushObject(newRoom);
-        });
-    },
-    findById : function ( id ) {
-        return this.findProperty("id", id);
-    }
-});
-
-
-App.deviceController = Em.ArrayController.create({
-    content : [],
-    initDevices : function ( deviceArray ) {
-        var me = this;
-        // clear the device list
-        me.set("content",[]);
-        // loop through the passed array and create new room items
-        deviceArray.forEach(function (item){
+        ds.clear();
+        // loop through the passed array and create new Device items
+        data.forEach(function (item){
             
             // use the DeviceTypeEnum to dynamically decied which Device class 
             // should be instanciated
@@ -239,22 +229,22 @@ App.deviceController = Em.ArrayController.create({
             // otherwise we should skip it
             if (deviceClass)
             {
-                var testDevice = deviceClass.create( {
+                var device = deviceClass.create( {
                         name : item.name , 
                         id : item.id, 
                         room_id : item.room,
                         device_type : item.device_type
                     });
-                testDevice.setStates(item.states)
-                me.pushObject(testDevice);
+                device.setStates(item.states);
+                ds.pushObject(device);
             }
         });
-    },
-    findById : function ( id ) {
-        return this.findProperty("id", id);
     }
-    
 });
+
+/**************************
+* Controllers
+**************************/
 
 
 
